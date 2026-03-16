@@ -59,3 +59,10 @@ Uso de componentes visuales de JavaFX para representar la información:
 1. **Clonar el repositorio:**
    ```bash
    git clone [https://github.com/Diejandro/analisis-ventas-javafx.git](https://github.com/Diejandro/analisis-ventas-javafx.git)
+
+---
+
+## 🎨 Créditos y Licencia
+
+* **Código:** Distribuido bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
+* **Diseño e Iconografía:** Todos los iconos de la interfaz (`.png`) han sido creados manualmente por el autor para este proyecto.
