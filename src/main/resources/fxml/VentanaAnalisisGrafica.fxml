@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="anchorGrafica" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.VentanaAnalisisGraficaController">
+
+    <!-- Que el AnchorPane ocupe todo el espacio -->
+    <children>
+        <VBox spacing="10" styleClass="background-config" stylesheets="@../css/style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+            <!-- Título general -->
+            <Label text="TABLAS DE DATOS" textFill="#e6eaf0">
+                <font>
+                    <Font name="System Bold" size="16.0" />
+                </font>
+            </Label>
+
+            <!-- Primera fila: Tabla total y productos populares -->
+            <HBox spacing="10" VBox.vgrow="ALWAYS">
+                <!-- TABLA TOTAL -->
+                <VBox styleClass="card" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                    <HBox alignment="CENTER" spacing="5">
+                        <Label text="TABLA TOTAL" textFill="#e6eaf0">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                        </Label>
+                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../images/Tabla.png" />
+                            </image>
+                        </ImageView>
+                    </HBox>
+                    <Pane fx:id="vPaneTabla" VBox.vgrow="ALWAYS" />
+                </VBox>
+
+                <!-- PRODUCTOS POPULARES -->
+                <VBox styleClass="card" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                    <HBox alignment="CENTER" spacing="5">
+                        <Label text="PRODUCTOS POPULARES" textFill="#e6eaf0">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                        </Label>
+                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../images/Barras.png" />
+                            </image>
+                        </ImageView>
+                    </HBox>
+                    <BarChart fx:id="barChart" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                        <xAxis>
+                            <CategoryAxis fx:id="ejeX" />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis fx:id="ejeY" label="Cantidad" />
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+            <padding>
+               <Insets left="10.0" right="10.0" top="10.0" />
+            </padding>
+            </HBox>
+
+            <!-- Segunda fila: Facturación por fecha y por producto -->
+            <HBox spacing="10" VBox.vgrow="ALWAYS">
+                <!-- FACTURACIÓN POR FECHA -->
+                <VBox styleClass="card" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                    <HBox alignment="CENTER" spacing="5">
+                        <Label text="FACTURACIÓN POR FECHA" textFill="#e6eaf0">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                        </Label>
+                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../images/Lineal.png" />
+                            </image>
+                        </ImageView>
+                  <Pane prefHeight="35.0" prefWidth="31.0" />
+                  <RadioButton fx:id="rbDay" layoutX="349.0" layoutY="19.0" mnemonicParsing="false" onAction="#isSelected" text="Dia" textFill="#e6eaf0">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="grupoFecha" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="rbMonth" mnemonicParsing="false" onAction="#isSelected" text="Mes" textFill="#e6eaf0" toggleGroup="$grupoFecha" />
+                  <RadioButton fx:id="rbYear" mnemonicParsing="false" onAction="#isSelected" text="Año" textFill="#e6eaf0" toggleGroup="$grupoFecha" />
+                    </HBox>
+                    <LineChart fx:id="lineChart" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                        <xAxis>
+                            <CategoryAxis fx:id="ejeXfecha" />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis fx:id="ejeYfacturacion" />
+                        </yAxis>
+                    </LineChart>
+                </VBox>
+
+                <!-- FACTURACIÓN POR PRODUCTO -->
+                <VBox styleClass="card" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+                    <HBox alignment="CENTER" spacing="5">
+                        <Label text="FACTURACIÓN POR PRODUCTO" textFill="#e6eaf0">
+                            <font>
+                                <Font name="System Bold" size="16.0" />
+                            </font>
+                        </Label>
+                        <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../images/Grafica_invertida.png" />
+                            </image>
+                        </ImageView>
+                    </HBox>
+                    <PieChart fx:id="pieChart" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS" />
+                </VBox>
+            <VBox.margin>
+               <Insets />
+            </VBox.margin>
+            <padding>
+               <Insets bottom="10.0" left="10.0" right="10.0" />
+            </padding>
+            </HBox>
+        </VBox>
+    </children>
+</AnchorPane>

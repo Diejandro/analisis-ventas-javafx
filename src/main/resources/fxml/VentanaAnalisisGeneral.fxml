@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="748.0" prefWidth="1018.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.VentanaAnalisisGeneralController">
+    
+    <children>
+        <VBox fx:id="vBox_general" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" VBox.vgrow="ALWAYS">
+         <children>
+            <VBox prefHeight="200.0" prefWidth="100.0" spacing="30.0" styleClass="background-config" stylesheets="@../css/style.css" VBox.vgrow="ALWAYS">
+               <children>
+                  <VBox spacing="20.0">
+                     <children>
+                        <Label text="INFORMACIÓN GENERAL" textFill="#e6eaf0">
+                           <font>
+                              <Font name="System Bold" size="16.0" />
+                           </font>
+                        </Label>
+                        <HBox prefHeight="120.0" prefWidth="200.0" spacing="20.0">
+                           <children>
+                              <VBox prefHeight="200.0" prefWidth="240.0" styleClass="card" stylesheets="@../css/style.css">
+                                 <children>
+                                    <HBox alignment="CENTER" prefHeight="48.0" prefWidth="240.0">
+                                       <children>
+                                          <Label prefHeight="20.0" prefWidth="254.0" text="CLIENTES" textFill="#bfc9d6">
+                                             <font>
+                                                <Font name="System Bold" size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Pane prefHeight="200.0" prefWidth="200.0" />
+                                          <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../images/Persona.png" />
+                                             </image>
+                                          </ImageView>
+                                       </children>
+                                    </HBox>
+                                    <Label fx:id="lGeneralClientesTotal" prefHeight="73.0" prefWidth="243.0" textFill="#4da8da">
+                                       <font>
+                                          <Font name="System Bold" size="35.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="240.0" styleClass="card2" stylesheets="@../css/style.css">
+                                 <children>
+                                    <HBox alignment="CENTER" prefHeight="48.0" prefWidth="240.0">
+                                       <children>
+                                          <Label prefHeight="20.0" prefWidth="223.0" text="PRODUCTOS" textFill="#0e1a2a">
+                                             <font>
+                                                <Font name="System Bold" size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Pane prefHeight="200.0" prefWidth="200.0" />
+                                          <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../images/Producto.png" />
+                                             </image>
+                                          </ImageView>
+                                       </children>
+                                    </HBox>
+                                    <Label fx:id="lGeneralProductosTotal" prefHeight="73.0" prefWidth="243.0" textFill="#0e1a2a">
+                                       <font>
+                                          <Font name="System Bold" size="35.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="240.0" styleClass="card" stylesheets="@../css/style.css">
+                                 <children>
+                                    <HBox alignment="CENTER" prefHeight="48.0" prefWidth="240.0">
+                                       <children>
+                                          <Label prefHeight="20.0" prefWidth="363.0" text="PROMEDIO POR ALUMNOS" textFill="#bfc9d6">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <Pane prefHeight="200.0" prefWidth="200.0" />
+                                          <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../images/Promedio_1.png" />
+                                             </image>
+                                          </ImageView>
+                                       </children>
+                                    </HBox>
+                                    <Label fx:id="lGeneral_PromedioTotal" prefHeight="73.0" prefWidth="243.0" textFill="#4da8da">
+                                       <font>
+                                          <Font name="System Bold" size="30.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="240.0" styleClass="card2" stylesheets="@../css/style.css">
+                                 <children>
+                                    <HBox alignment="CENTER" prefHeight="48.0" prefWidth="240.0">
+                                       <children>
+                                          <Label prefHeight="20.0" prefWidth="369.0" text="FACTURACIÓN TOTAL" textFill="#0e1a2a">
+                                             <font>
+                                                <Font name="System Bold" size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Pane prefHeight="200.0" prefWidth="200.0" />
+                                          <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../images/Ventas.png" />
+                                             </image>
+                                          </ImageView>
+                                       </children>
+                                    </HBox>
+                                    <Label fx:id="lGeneralFacturacionTotal" prefHeight="73.0" prefWidth="243.0" textFill="#0e1a2a">
+                                       <font>
+                                          <Font name="System Bold" size="30.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <HBox prefHeight="170.0" prefWidth="200.0" spacing="10.0">
+                     <children>
+                        <VBox prefHeight="200.0" prefWidth="490.0" styleClass="card" stylesheets="@../css/style.css">
+                           <children>
+                              <Label prefHeight="25.0" prefWidth="188.0" text="FLUJO DE VENTAS" textFill="#e6eaf0">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                              </Label>
+                              <HBox alignment="CENTER_LEFT" prefHeight="36.0" prefWidth="436.0">
+                                 <VBox.margin>
+                                    <Insets top="10.0" />
+                                 </VBox.margin>
+                                 <children>
+                                    <Label prefHeight="25.0" prefWidth="122.0" text="Curso Básico" textFill="#bfc9d6">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="lVentasBasico" prefHeight="25.0" prefWidth="102.0" textFill="#4da8da">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="55.0" prefHeight="36.0" prefWidth="436.0">
+                                 <children>
+                                    <Label prefHeight="25.0" prefWidth="122.0" text="Curso Intermedio" textFill="#bfc9d6">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="lVentasIntermedio" prefHeight="25.0" prefWidth="102.0" textFill="#4da8da">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="55.0" prefHeight="36.0" prefWidth="436.0">
+                                 <children>
+                                    <Label prefHeight="25.0" prefWidth="122.0" text="Curso Avanzado" textFill="#bfc9d6">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Pane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="lVentasAvanzado" prefHeight="25.0" prefWidth="102.0" textFill="#4da8da">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                           </children>
+                           <opaqueInsets>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </opaqueInsets>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </VBox>
+                        <VBox layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="490.0" styleClass="card" stylesheets="@../css/style.css">
+                           <children>
+                              <Label prefHeight="25.0" prefWidth="197.0" text="FLUJO DE FACTURACIÓN" textFill="#e6eaf0">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                              </Label>
+                              <HBox alignment="CENTER_LEFT" prefHeight="36.0" prefWidth="436.0">
+                                 <VBox.margin>
+                                    <Insets top="10.0" />
+                                 </VBox.margin>
+                                 <children>
+                                    <Label prefHeight="25.0" prefWidth="122.0" text="Inglés básico" textFill="#bfc9d6">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Pane prefHeight="36.0" prefWidth="205.0" HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="lFacturacionBasico" prefHeight="25.0" prefWidth="151.0" textFill="#4da8da">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="55.0" prefHeight="36.0" prefWidth="436.0">
+                                 <children>
+                                    <Label prefHeight="25.0" prefWidth="135.0" text="Inglés intermedio" textFill="#bfc9d6">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Pane prefHeight="36.0" prefWidth="189.0" HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="lFacturacionIntermedio" prefHeight="25.0" prefWidth="151.0" textFill="#4da8da">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="55.0" prefHeight="36.0" prefWidth="436.0">
+                                 <children>
+                                    <Label prefHeight="25.0" prefWidth="134.0" text="Inglés avanzado" textFill="#bfc9d6">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Pane prefHeight="36.0" prefWidth="189.0" HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="lFacturacionAvanzado" prefHeight="25.0" prefWidth="151.0" textFill="#4da8da">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                           </children>
+                           <opaqueInsets>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </opaqueInsets>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <VBox prefHeight="290.0" prefWidth="100.0" spacing="20.0">
+    <children>
+        <Label text="CLIENTES DESTACADOS" textFill="#e6eaf0">
+            <font>
+                <Font name="System Bold" size="16.0" />
+            </font>
+        </Label>
+
+        <HBox prefHeight="270.0" styleClass="card" stylesheets="@../css/style.css">
+            <children>
+                <VBox prefHeight="175.0" prefWidth="190.0">
+                    <children>
+                        <Pane prefHeight="130.0" prefWidth="190.0" style="-fx-background-color: #0E1A2A; -fx-background-radius: 15;">
+                            <children>
+                                <ImageView fitHeight="128.0" fitWidth="130.0" layoutX="27.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../images/P_diamante.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </Pane>
+                        <Label fx:id="nombreDestacado1" prefHeight="40.0" prefWidth="190.0" textFill="#bfc9d6">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets top="20.0" />
+                            </VBox.margin>
+                        </Label>
+                        <Label fx:id="mailDestacado1" prefHeight="31.0" prefWidth="190.0" textFill="#bfc9d6">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+
+                <Pane HBox.hgrow="ALWAYS" />
+
+                <VBox prefHeight="175.0" prefWidth="190.0">
+                    <children>
+                        <Pane prefHeight="130.0" prefWidth="190.0" style="-fx-background-color: #0E1A2A; -fx-background-radius: 15;">
+                            <children>
+                                <ImageView fitHeight="128.0" fitWidth="130.0" layoutX="28.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../images/P_platino.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </Pane>
+                        <Label fx:id="nombreDestacado2" prefHeight="40.0" prefWidth="190.0" textFill="#bfc9d6">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets top="20.0" />
+                            </VBox.margin>
+                        </Label>
+                        <Label fx:id="mailDestacado2" prefHeight="31.0" prefWidth="190.0" textFill="#bfc9d6">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+
+                <Pane HBox.hgrow="ALWAYS" />
+
+                <VBox prefHeight="175.0" prefWidth="190.0">
+                    <children>
+                        <Pane prefHeight="130.0" prefWidth="190.0" style="-fx-background-color: #0E1A2A; -fx-background-radius: 15;">
+                            <children>
+                                <ImageView fitHeight="128.0" fitWidth="130.0" layoutX="27.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../images/P_oro.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </Pane>
+                        <Label fx:id="nombreDestacado3" prefHeight="40.0" prefWidth="190.0" textFill="#bfc9d6">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets top="20.0" />
+                            </VBox.margin>
+                        </Label>
+                        <Label fx:id="mailDestacado3" prefHeight="31.0" prefWidth="190.0" textFill="#bfc9d6">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+
+                <Pane HBox.hgrow="ALWAYS" />
+
+                <VBox prefHeight="175.0" prefWidth="190.0">
+                    <children>
+                        <Pane prefHeight="130.0" prefWidth="190.0" style="-fx-background-color: #0E1A2A; -fx-background-radius: 15;">
+                            <children>
+                                <ImageView fitHeight="128.0" fitWidth="130.0" layoutX="36.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../images/P_plata.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </Pane>
+                        <Label fx:id="nombreDestacado4" prefHeight="40.0" prefWidth="190.0" textFill="#bfc9d6">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets top="20.0" />
+                            </VBox.margin>
+                        </Label>
+                        <Label fx:id="mailDestacado4" prefHeight="31.0" prefWidth="190.0" textFill="#bfc9d6">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+
+                <Pane HBox.hgrow="ALWAYS" />
+
+                <VBox prefHeight="175.0" prefWidth="190.0">
+                    <children>
+                        <Pane prefHeight="130.0" prefWidth="190.0" style="-fx-background-color: #0E1A2A; -fx-background-radius: 15;">
+                            <children>
+                                <ImageView fitHeight="128.0" fitWidth="130.0" layoutX="32.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../images/P_cobre.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </Pane>
+                        <Label fx:id="nombreDestacado5" prefHeight="40.0" prefWidth="190.0" textFill="#bfc9d6">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets top="20.0" />
+                            </VBox.margin>
+                        </Label>
+                        <Label fx:id="mailDestacado5" prefHeight="31.0" prefWidth="190.0" textFill="#bfc9d6">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </VBox>
+            </children>
+
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+        </HBox>
+    </children>
+</VBox>
+
+               </children>
+               <padding>
+                  <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+               </padding>
+            </VBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

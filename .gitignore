@@ -1,0 +1,16 @@
+# Directorio de compilación de Maven
+target/
+
+# Archivos específicos de Eclipse
+.settings/
+.project
+.classpath
+*.prefs
+
+# Archivos de otros IDEs por si acaso
+.idea/
+*.iml
+.vscode/
+
+# Archivos compilados de Java
+*.class

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="rootPaneGeneral" prefHeight="810.0" prefWidth="1315.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.VentanaAnalisisController">
+   <left>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="250.0" spacing="7.0" stylesheets="@../css/style.css" BorderPane.alignment="CENTER">
+         <children>
+            <Pane prefHeight="150.0" prefWidth="260.0" />
+            <HBox alignment="CENTER_LEFT" layoutX="30.0" layoutY="527.0" prefHeight="132.0" prefWidth="209.0" spacing="20.0">
+               <padding>
+                  <Insets left="20.0" right="20.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" layoutX="30.0" layoutY="460.0" onMouseClicked="#onClickedGeneral" prefHeight="45.0" prefWidth="233.0" spacing="20.0" styleClass="mi-boton-lateral" stylesheets="@../css/style.css">
+               <children>
+                  <ImageView fitHeight="148.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/General.png" />
+                     </image>
+                  </ImageView>
+                  <Label styleClass="mi-boton-lateral-label" stylesheets="@../css/style.css" text="General" textFill="#e6eaf0">
+                     <font>
+                        <Font name="Arial" size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets left="30.0" right="20.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" layoutX="30.0" layoutY="482.0" onMouseClicked="#onClickedGraphics" prefHeight="45.0" prefWidth="200.0" spacing="20.0" styleClass="mi-boton-lateral">
+               <children>
+                  <ImageView fitHeight="148.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/Graficos.png" />
+                     </image>
+                  </ImageView>
+                  <Label text="Gráficos" textFill="#e6eaf0">
+                     <font>
+                        <Font name="Arial" size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets left="30.0" right="20.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" layoutX="30.0" layoutY="445.0" onMouseClicked="#onClickedReport" prefHeight="45.0" prefWidth="200.0" spacing="20.0" styleClass="mi-boton-lateral">
+               <children>
+                  <ImageView fitHeight="148.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/Informe.png" />
+                     </image>
+                  </ImageView>
+                  <Label text="Informe" textFill="#e6eaf0">
+                     <font>
+                        <Font name="Arial" size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets left="30.0" right="20.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" layoutX="30.0" layoutY="505.0" prefHeight="250.0" prefWidth="200.0" spacing="20.0">
+               <padding>
+                  <Insets left="20.0" right="20.0" />
+               </padding>
+            </HBox>
+         </children>
+         <styleClass>
+            <String fx:value="lateral-bar-vonfig" />
+            <String fx:value="right-side-border" />
+         </styleClass>
+      </VBox>
+   </left>
+   <top>
+      <HBox alignment="CENTER_LEFT" prefHeight="55.0" prefWidth="1315.0" spacing="10.0" styleClass="background-config" stylesheets="@../css/style.css" BorderPane.alignment="CENTER">
+         <children>
+            <Pane prefHeight="55.0" prefWidth="250.0" styleClass="lateral-bar-vonfig" stylesheets="@../css/style.css" />
+            <Label prefHeight="23.0" prefWidth="352.0" text="Análisis de ventas (English School)" textFill="#e6eaf0">
+               <font>
+                  <Font name="Arial Bold" size="20.0" />
+               </font>
+            </Label>
+            <Pane prefHeight="55.0" prefWidth="435.0" HBox.hgrow="ALWAYS" />
+            <Button mnemonicParsing="false" onMouseClicked="#onClickedData" prefHeight="33.0" prefWidth="95.0" styleClass="boton-redondeado" stylesheets="@../css/style.css" text="Añadir" textAlignment="CENTER" textFill="#e6eaf0">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Button>
+            <Button layoutX="1195.0" layoutY="21.0" mnemonicParsing="false" onMouseClicked="#onClickedLoadCSV" prefHeight="33.0" prefWidth="137.0" styleClass="boton-redondeado" stylesheets="@../css/style.css" text="Cargar CSV" textAlignment="CENTER" textFill="#e6eaf0">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Button>
+         </children>
+         <padding>
+            <Insets right="10.0" />
+         </padding>
+      </HBox>
+   </top>
+   <center>
+      <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+        </content>
+      </ScrollPane>
+   </center>
+</BorderPane>
