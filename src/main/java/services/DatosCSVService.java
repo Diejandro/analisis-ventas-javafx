@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import models.Alumno;
 import models.RegistroCSV;
 import models.Venta;
 
@@ -241,16 +242,17 @@ public class DatosCSVService {
     public List<Venta> obtenerVentas() {
         return datos.stream()
                 .filter(r -> r != null && r.getId() != null)
-                .map(r -> new Venta(
-                        r.getId(),
-                        r.getNombre(),
-                        r.getCif(),
-                        r.getEmail(),
-                        r.getProducto(),
-                        r.getPrecio(),
-                        r.getFecha()
-                ))
-                .collect(Collectors.toList());
+                .map(r -> {
+                	Alumno temp = new Alumno(0L, r.getCif(), r.getNombre(), r.getEmail());
+                	
+                	return new Venta( 
+                			Long.valueOf(r.getId()), 
+                			temp,
+                			r.getProducto(),
+                			r.getPrecio(),
+                			r.getFecha()
+                			);})
+                	.collect(Collectors.toList());
     }
 
 

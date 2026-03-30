@@ -14,6 +14,8 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
+
+import models.Alumno;
 import models.Venta;
 
 // TODO: Auto-generated Javadoc
@@ -187,7 +189,7 @@ public class LectorCSV {
             return null;
         }
         
-        String id = obtenerValor(linea, 0);
+        String idStr = obtenerValor(linea, 0);
         String nombre = obtenerValor(linea, 1);
         String cif = obtenerValor(linea, 2);
         String email = obtenerValor(linea, 3);
@@ -196,15 +198,24 @@ public class LectorCSV {
         String fechaStr = obtenerValor(linea, 6);
         
         // Validar ID (campo obligatorio)
-        if (id.isEmpty()) {
+        if (idStr.isEmpty()) {
             System.err.println("Línea " + numeroLinea + ": ID vacío, se omite esta línea");
             return null;
         }
         
-        double precio = parsearDouble(precioStr, numeroLinea);
-        LocalDate fecha = parsearFecha(fechaStr, numeroLinea);
-        
-        return new Venta(id, nombre, cif, email, producto, precio, fecha);
+        try {
+        	Long idVenta = Long.valueOf(idStr.trim());
+        	
+        	double precio = parsearDouble(precioStr, numeroLinea);
+        	LocalDate fecha = parsearFecha(fechaStr, numeroLinea);
+        	
+        	Alumno alumnoAsociado = new Alumno(0L, cif, nombre, email);
+        	
+        	return new Venta(idVenta, alumnoAsociado, producto, precio, fecha);
+        }catch(NumberFormatException e) {
+        	System.err.println("Línea " + numeroLinea + ": Error de formato en el ID '" + idStr + "'");
+            return null;
+        }
     }
 
     /**

@@ -17,7 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+import models.Alumno;
 import models.RegistroCSV;
 import models.Venta;
 import services.DatosCSVService;
@@ -107,15 +107,17 @@ public class VentanaAnalisisController {
     private List<Venta> obtenerVentas() {
         ObservableList<RegistroCSV> registros = DatosCSVService.getInstance().getDatos();
         return registros.stream()
-                .map(r -> new Venta(
-                        r.getId(),
-                        r.getNombre(),
-                        r.getCif(),
-                        r.getEmail(),
-                        r.getProducto(),
-                        r.getPrecio(),
-                        r.getFecha()
-                ))
+                .map(r -> {
+                	Alumno alumno = new Alumno(0L, r.getCif(), r.getNombre(), r.getEmail());
+                	
+                	return new Venta(
+                			Long.valueOf(r.getId()),
+                			alumno,
+                			r.getProducto(),
+                			r.getPrecio(),
+                			r.getFecha()
+                			
+                );})
                 .collect(Collectors.toList());
     }
 
