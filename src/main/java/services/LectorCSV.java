@@ -8,7 +8,10 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -56,10 +59,13 @@ public class LectorCSV {
             List<String[]> registros = csvReader.readAll();
             System.out.println("Leyendo " + registros.size() + " líneas de CSV...");
             
+            Map<String, Alumno> mapaAlumnos = new HashMap<>();
+            
+            
             for (int i = 0; i < registros.size(); i++) {
                 String[] linea = registros.get(i);
                 try {
-                    Venta venta = parsearVenta(linea, i + 2); // +2 porque salta cabecera y el índice 0
+                    Venta venta = parsearVenta(linea, i + 2, mapaAlumnos); // +2 porque salta cabecera y el índice 0
                     if (venta != null) {
                         ventas.add(venta);
                     }
@@ -182,7 +188,7 @@ public class LectorCSV {
      * @param numeroLinea Número de línea para mensajes de error
      * @return Objeto Venta o null si hay error
      */
-    private Venta parsearVenta(String[] linea, int numeroLinea) {
+    private Venta parsearVenta(String[] linea, int numeroLinea, Map<String, Alumno> mapaAlumnos) {
         if (linea == null || linea.length < 7) {
             System.err.println("Línea " + numeroLinea + " incompleta. Esperando 7 campos, encontrado: "
                     + (linea != null ? linea.length : 0));
@@ -190,9 +196,9 @@ public class LectorCSV {
         }
         
         String idStr = obtenerValor(linea, 0);
-        String nombre = obtenerValor(linea, 1);
-        String cif = obtenerValor(linea, 2);
-        String email = obtenerValor(linea, 3);
+        String nombre = obtenerValor(linea, 1).trim();
+        String cif = obtenerValor(linea, 2).trim();
+        String email = obtenerValor(linea, 3).trim();
         String producto = obtenerValor(linea, 4);
         String precioStr = obtenerValor(linea, 5);
         String fechaStr = obtenerValor(linea, 6);
@@ -209,7 +215,7 @@ public class LectorCSV {
         	double precio = parsearDouble(precioStr, numeroLinea);
         	LocalDate fecha = parsearFecha(fechaStr, numeroLinea);
         	
-        	Alumno alumnoAsociado = new Alumno(0L, cif, nombre, email);
+        	Alumno alumnoAsociado = mapaAlumnos.computeIfAbsent(cif, k -> new Alumno(0L, k, nombre, email));
         	
         	return new Venta(idVenta, alumnoAsociado, producto, precio, fecha);
         }catch(NumberFormatException e) {

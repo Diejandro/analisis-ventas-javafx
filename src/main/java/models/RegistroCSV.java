@@ -9,25 +9,12 @@ import java.time.format.DateTimeParseException;
  */
 public class RegistroCSV {
 
-    /** The id. */
     private String id;
-    
-    /** The nombre. */
     private String nombre;
-    
-    /** The cif. */
     private String cif;
-    
-    /** The email. */
     private String email;
-    
-    /** The producto. */
-    private String producto;
-    
-    /** The precio. */
+    private Producto producto;
     private double precio;
-    
-    /** The fecha. */
     private LocalDate fecha;
 
     /** The Constant FORMATOS_FECHA. */
@@ -54,8 +41,8 @@ public class RegistroCSV {
      * @param precio the precio
      * @param fecha the fecha
      */
-    public RegistroCSV(String id, String nombre, String cif, String email,
-                       String producto, double precio, LocalDate fecha) {
+    public RegistroCSV(String cif, String nombre, String email, String id,
+                       Producto producto, double precio, LocalDate fecha) {
         this.id = id;
         this.nombre = nombre;
         this.cif = cif;
@@ -73,17 +60,23 @@ public class RegistroCSV {
      * @return the registro CSV
      */
     public static RegistroCSV fromArray(String[] campos) {
-        if (campos.length < 7) return null;
-
-        String id = campos[0].trim();
-        String nombre = campos[1].trim();
-        String cif = campos[2].trim();
-        String email = campos[3].trim();
-        String curso = campos[4].trim();
-        double precio = parseDouble(campos[5].trim());
-        LocalDate fecha = parseFecha(campos[6].trim());
-
-        return new RegistroCSV(id, nombre, cif, email, curso, precio, fecha);
+    	
+    	if (campos == null || campos.length < 7) {
+    		return null;
+    	}
+    	
+    	RegistroCSV r = new RegistroCSV();
+    	
+    	r.setCif(campos[0].trim());
+    	r.setNombre(campos[1].trim());
+    	r.setEmail(campos[2].trim());
+    	r.setId(campos[3].trim());
+    	r.setProducto(new Producto(campos[4].trim()));
+    	
+    	r.setPrecio(parseDouble(campos[5]));
+    	r.setFecha(parseFecha(campos[6]));
+    	
+    	return r;
     }
 
     /**
@@ -93,11 +86,15 @@ public class RegistroCSV {
      * @return the string
      */
     public String toCSV(char sep) {
-        return String.join(String.valueOf(sep),
-                id, nombre, cif, email, producto,
-                String.valueOf(precio),
-                fecha.toString()
-        );
+    	String s = String.valueOf(sep);
+    	return String.join(s,
+    			cif,
+    			nombre,
+    			id,
+    			producto.nombre(),
+    			String.valueOf(precio),
+    			fecha.toString()
+    			);
     }
 
     /**
@@ -107,10 +104,10 @@ public class RegistroCSV {
      * @return the double
      */
     private static double parseDouble(String valor) {
-        if (valor == null || valor.isEmpty()) return 0.0;
+        if (valor == null || valor.isBlank()) return 0.0;
         try {
-            valor = valor.replaceAll("[^0-9.,\\-]", "").replace(',', '.');
-            return Double.parseDouble(valor);
+            String limpio = valor.trim().replaceAll("[^0-9.,\\-]", "").replace(',', '.');
+            return Double.parseDouble(limpio);
         } catch (NumberFormatException e) {
             return 0.0;
         }
@@ -123,10 +120,11 @@ public class RegistroCSV {
      * @return the local date
      */
     private static LocalDate parseFecha(String valor) {
-        if (valor == null || valor.isEmpty()) return LocalDate.now();
+        if (valor == null || valor.isBlank()) return LocalDate.now();
+        String limpio = valor.trim();
         for (DateTimeFormatter f : FORMATOS_FECHA) {
             try {
-                return LocalDate.parse(valor, f);
+                return LocalDate.parse(limpio, f);
             } catch (DateTimeParseException e) {
                 // siguiente formato
             }
@@ -196,14 +194,14 @@ public class RegistroCSV {
      *
      * @return the producto
      */
-    public String getProducto() { return producto; }
+    public Producto getProducto() { return producto; }
     
     /**
      * Sets the producto.
      *
      * @param curso the new producto
      */
-    public void setProducto(String curso) { this.producto = curso; }
+    public void setProducto(Producto producto) { this.producto = producto; }
 
     /**
      * Gets the precio.

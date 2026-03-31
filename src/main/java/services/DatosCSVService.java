@@ -2,7 +2,9 @@ package services;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
@@ -240,14 +242,20 @@ public class DatosCSVService {
      * @return the list
      */
     public List<Venta> obtenerVentas() {
+    	
+    	Map<String, Alumno> alumnosMap = new HashMap<>();
+    	
         return datos.stream()
                 .filter(r -> r != null && r.getId() != null)
                 .map(r -> {
-                	Alumno temp = new Alumno(0L, r.getCif(), r.getNombre(), r.getEmail());
+                	
+                	Alumno alumnoUnificado = alumnosMap.computeIfAbsent(r.getCif().trim(), cifLimpio ->
+                	new Alumno(0L, cifLimpio, r.getNombre().trim(), r.getEmail().trim())
+                	);
                 	
                 	return new Venta( 
                 			Long.valueOf(r.getId()), 
-                			temp,
+                			alumnoUnificado,
                 			r.getProducto(),
                 			r.getPrecio(),
                 			r.getFecha()

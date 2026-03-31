@@ -37,8 +37,12 @@ public class AnalizadorVentas {
 	 * @return the int
 	 */
 	public int obtenerTotalClientes() {
+		if (datos == null || datos.isEmpty()) return 0;
 		
-		return datos == null ? 0 : new HashSet<>(datos).size();
+		return (int) datos.stream()
+				.map(Venta::getCif)
+				.distinct()
+				.count();
 	}
 
 	/**
@@ -162,7 +166,7 @@ public class AnalizadorVentas {
 	                        entry.getValue().size()
 	                );
 	            })
-	            .sorted(Comparator.comparingLong(ClienteEstadistica::getTotalCompras).reversed())
+	            .sorted(Comparator.comparingLong(ClienteEstadistica::getTotalCompras))
 	            .toList();
 
 	    return ranking;

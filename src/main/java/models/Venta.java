@@ -4,42 +4,24 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * The Class Venta.
+ * Clase que representa una transacción de venta.
+ * Se mantiene como Clase para permitir mutabilidad y futuras extensiones.
  */
 public class Venta {
 	
-	/** The id. */
 	private Long id;
-	
 	private Alumno alumno;
-	
-	/** The fecha. */
 	private LocalDate fecha;
+	private Producto producto;
 	
-	/** The producto. */
-	private String producto;
-	
-	/** The precio. */
 	private double precio;
 	
-	/**
-	 * Instantiates a new venta.
-	 */
 	public Venta() {}
 
 	/**
-	 * Instantiates a new venta.
-	 *
-	 * @param id the id
-	 * @param nombre the nombre
-	 * @param cif the cif
-	 * @param email the email
-	 * @param producto the producto
-	 * @param precio the precio
-	 * @param fecha the fecha
+	 * Constructor actualizado para integrar el objeto Producto.
 	 */
-	public Venta(Long id, Alumno alumno, String producto, double precio, LocalDate fecha){
-		super();
+	public Venta(Long id, Alumno alumno, Producto producto, double precio, LocalDate fecha){
 		this.id = id;
 		this.alumno = alumno;
 		this.fecha = fecha;
@@ -47,28 +29,34 @@ public class Venta {
 		this.precio = precio;
 	}
 
-
 	public Long getId() {
 		return id;
 	}
-
 
 	public void setId(Long id) {
 		this.id = id;
 	}
 	
+	// Métodos puente para mantener la compatibilidad con las tablas de la interfaz
 	public String getNombre() {
-		return alumno.getNombre();
+		return (alumno != null) ? alumno.getNombre() : "";
 	}
 	
 	public String getCif() {
-		return alumno.getCIF();
+		return (alumno != null) ? alumno.getCIF() : "";
 	}
 	
 	public String getEmail() {
-		return alumno.getEmail();
+		return (alumno != null) ? alumno.getEmail() : "";
 	}
 
+	public Alumno getAlumno() {
+		return alumno;
+	}
+
+	public void setAlumno(Alumno alumno) {
+		this.alumno = alumno;
+	}
 
 	public LocalDate getFecha() {
 		return fecha;
@@ -78,31 +66,30 @@ public class Venta {
 		this.fecha = fecha;
 	}
 
-
-	public String getProducto() {
+	public Producto getProducto() {
 		return producto;
 	}
 
-
-	public void setProducto(String producto) {
+	public void setProducto(Producto producto) {
 		this.producto = producto;
 	}
-
 
 	public Double getPrecio() {
 		return precio;
 	}
 
-
 	public void setPrecio(Double precio) {
 		this.precio = precio;
 	}
 
-
 	@Override
 	public String toString() {
-		return "VentasBeans [id=" + id + ", nombre=" + alumno.getNombre() + ", cif=" + alumno.getCIF() + ", email=" + alumno.getEmail() + ", fecha=" + fecha
-				+ ", producto=" + producto + ", precio=" + precio + "]";
+		// Usamos producto.nombre() para el log, ya que producto es un Record
+		return "Venta [id=" + id + 
+               ", cif=" + getCif() + 
+               ", producto=" + (producto != null ? producto.nombre() : "null") + 
+               ", precio=" + precio + 
+               ", fecha=" + fecha + "]";
 	}
 
 	@Override
@@ -112,15 +99,9 @@ public class Venta {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) return true;
+		if (obj == null || getClass() != obj.getClass()) return false;
 		Venta other = (Venta) obj;
 		return Objects.equals(id, other.id);
 	}
 }
-
-
