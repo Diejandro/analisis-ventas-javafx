@@ -1,51 +1,17 @@
 package models;
 
 /**
- * The Class ClienteEstadistica.
+ * Record para las estadísticas de cliente.
+ * Inmutable, limpio y perfecto para el ranking.
  */
-public class ClienteEstadistica {
+public record ClienteEstadistica(String cif, String nombre, String email, long totalCompras) {
     
-    /** The nombre. */
-    private String nombre;
-    
-    /** The email. */
-    private String email;
-    
-    /** The total compras. */
-    private int totalCompras;
-
     /**
-     * Instantiates a new cliente estadistica.
-     *
-     * @param nombre the nombre
-     * @param email the email
-     * @param totalCompras the total compras
+     * Este método permite que las medallas (Diamante, Platino, etc.) 
+     * sigan funcionando si tu lógica depende de "getTotalCompras()".
      */
-    public ClienteEstadistica(String nombre, String email, int totalCompras) {
-        this.nombre = nombre;
-        this.email = email;
-        this.totalCompras = totalCompras;
+    public long getTotalCompras() {
+        return totalCompras;
     }
-
-    /**
-     * Gets the nombre.
-     *
-     * @return the nombre
-     */
-    public String getNombre() { return nombre; }
-    
-    /**
-     * Gets the email.
-     *
-     * @return the email
-     */
-    public String getEmail() { return email; }
-    
-    /**
-     * Gets the total compras.
-     *
-     * @return the total compras
-     */
-    public long getTotalCompras() { return totalCompras; }
 }
 

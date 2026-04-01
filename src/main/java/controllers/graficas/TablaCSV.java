@@ -1,31 +1,27 @@
 package controllers.graficas;
 
-import models.Venta;
+import java.util.List;
+
 import javafx.collections.FXCollections;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
+import models.Venta;
 
-import java.util.List;
-
-// TODO: Auto-generated Javadoc
 /**
- * Clase encargada de gestionar la tabla CSV.
+ * Clase encargada de gestionar y renderizar la tabla de datos (TableView) 
+ * utilizando los objetos de dominio Venta.
  */
 public class TablaCSV {
 
-    /** The tabla. */
     private TableView<Venta> tabla;
-    
-    /** The v pane tabla. */
     private Pane vPaneTabla;
 
     /**
-     * Constructor.
-     *
-     * @param vPaneTabla the v pane tabla
+     * Constructor que vincula la tabla a un contenedor Pane.
+     * * @param vPaneTabla Contenedor donde se insertará la tabla.
      */
     public TablaCSV(Pane vPaneTabla) {
         this.vPaneTabla = vPaneTabla;
@@ -33,72 +29,76 @@ public class TablaCSV {
     }
 
     /**
-     * Inicializa la tabla.
+     * Crea la instancia de TableView y la vincula al tamaño del contenedor.
      */
     private void inicializarTabla() {
-        tabla = new TableView<>();
+        this.tabla = new TableView<>();
+        
+        // Sincronización de dimensiones con el contenedor FXML
         tabla.prefWidthProperty().bind(vPaneTabla.widthProperty());
         tabla.prefHeightProperty().bind(vPaneTabla.heightProperty());
 
-        // Evita que JavaFX expanda columnas y respeta tu ancho real
+        // Política de redimensionado manual para permitir el auto-ajuste de columnas
         tabla.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
         vPaneTabla.getChildren().add(tabla);
     }
 
     /**
-     * Carga los datos en la tabla.
-     *
-     * @param ventas Lista de ventas a mostrar
+     * Carga la lista de ventas en la tabla y genera las columnas dinámicamente.
+     * * @param ventas Lista de objetos Venta a mostrar.
      */
     public void cargarDatos(List<Venta> ventas) {
+        if (tabla == null) return;
+        
         if (ventas == null || ventas.isEmpty()) {
             limpiar();
             return;
         }
 
+        // Limpieza de estados previos
         tabla.getColumns().clear();
         tabla.setItems(FXCollections.observableArrayList(ventas));
 
-        // Crear columnas fijas según la clase Venta
+        // Configuración de columnas vinculadas a los getters de Venta
+        // "id" -> getId(), "nombre" -> getNombre(), etc.
         crearColumna("ID", "id");
         crearColumna("Nombre", "nombre");
         crearColumna("CIF", "cif");
         crearColumna("Email", "email");
-        crearColumna("Producto", "producto");
-        crearColumna("Precio", "precio");
+        crearColumna("Producto", "producto"); // Renderiza Producto.toString()
+        crearColumna("Precio (€)", "precio");
         crearColumna("Fecha", "fecha");
 
-        // Ajustar ancho de cada columna según su contenido
-        tabla.getColumns().forEach(col -> autoFitColumn(col));
+        // Ajuste de ancho automático basado en el contenido real
+        tabla.getColumns().forEach(this::autoFitColumn);
     }
 
     /**
-     * Método auxiliar para crear columnas vinculadas a getters de Venta.
-     *
-     * @param titulo the titulo
-     * @param propiedad the propiedad
+     * Crea una columna y vincula su celda a una propiedad del modelo Venta.
      */
     private void crearColumna(String titulo, String propiedad) {
         TableColumn<Venta, Object> col = new TableColumn<>(titulo);
         col.setCellValueFactory(new PropertyValueFactory<>(propiedad));
-
-        // Ancho mínimo para que se vea bien
-        col.setMinWidth(60);
-
+        
+        col.setMinWidth(80);
         tabla.getColumns().add(col);
     }
 
     /**
-     * Ajusta automáticamente el ancho de una columna al contenido.
-     *
-     * @param column the column
+     * Calcula el ancho óptimo para la columna basándose en el texto más largo
+     * presente en las celdas o en la cabecera.
      */
     private void autoFitColumn(TableColumn<Venta, ?> column) {
+        // Medición del texto de la cabecera
         Text tempText = new Text(column.getText());
         double max = tempText.getLayoutBounds().getWidth();
 
-        for (int i = 0; i < tabla.getItems().size(); i++) {
+        // Muestreo de las primeras 100 filas para optimizar el rendimiento
+        int totalFilas = tabla.getItems().size();
+        int filasAMuestrear = Math.min(totalFilas, 100);
+
+        for (int i = 0; i < filasAMuestrear; i++) {
             Object cellData = column.getCellData(i);
             if (cellData != null) {
                 tempText = new Text(cellData.toString());
@@ -109,11 +109,12 @@ public class TablaCSV {
             }
         }
 
-        column.setPrefWidth(max + 20); // margen para padding interno
+        // Aplicación del ancho con un margen de seguridad (padding)
+        column.setPrefWidth(max + 25); 
     }
 
     /**
-     * Limpia la tabla.
+     * Vacía los datos de la tabla y elimina las columnas.
      */
     public void limpiar() {
         if (tabla != null) {
@@ -122,13 +123,7 @@ public class TablaCSV {
         }
     }
 
-    /**
-     * Obtiene la tabla.
-     *
-     * @return the tabla
-     */
     public TableView<Venta> getTabla() {
         return tabla;
     }
 }
-

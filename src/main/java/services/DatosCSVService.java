@@ -12,38 +12,26 @@ import javafx.collections.ObservableList;
 import models.Alumno;
 import models.RegistroCSV;
 import models.Venta;
+import models.Producto;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class DatosCSVService.
+ * Servicio central para la gestión de datos. 
+ * Maneja archivos temporales, persistencia y transformación de modelos.
  */
 public class DatosCSVService {
 
-    /** The instance. */
     private static DatosCSVService instance;
-
-    /** The archivo temporal. */
     private File archivoTemporal;
-    
-    /** The separador. */
     private char separador;
     
-    /** The cambios sin guardar. */
+    // Flag de control para el cierre de la aplicación
     private boolean cambiosSinGuardar = false;
 
-    /** The datos. */
+    // Lista que alimenta las tablas de la interfaz
     private final ObservableList<RegistroCSV> datos = FXCollections.observableArrayList();
 
-    /**
-     * Instantiates a new datos CSV service.
-     */
     private DatosCSVService() {}
 
-    /**
-     * Gets the single instance of DatosCSVService.
-     *
-     * @return single instance of DatosCSVService
-     */
     public static DatosCSVService getInstance() {
         if (instance == null) {
             instance = new DatosCSVService();
@@ -51,219 +39,135 @@ public class DatosCSVService {
         return instance;
     }
 
-    /* ===============================
-       CARGA DE CSV
-       =============================== */
+    /* ============================================================
+       MÉTODOS DE ESTADO (Cruciales para el Main)
+       ============================================================ */
 
     /**
-     * Cargar CSV.
-     *
-     * @param archivo the archivo
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    public void cargarCSV(File archivo) throws IOException {
-        this.separador = detectarSeparador(archivo);
-        this.archivoTemporal = crearTemporal(archivo);
-
-        datos.clear();
-        leerCSV(archivoTemporal);
-        cambiosSinGuardar = false;
-    }
-
-    /* ===============================
-       LECTURA / ESCRITURA
-       =============================== */
-
-    /**
-     * Leer CSV.
-     *
-     * @param archivo the archivo
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private void leerCSV(File archivo) throws IOException {
-        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                if (linea.trim().isEmpty()) continue; // ignoramos líneas vacías
-                String[] campos = linea.split(String.valueOf(separador));
-                RegistroCSV registro = RegistroCSV.fromArray(campos);
-                if (registro != null) datos.add(registro); // solo agregamos si no es null
-            }
-        }
-    }
-
-
-    /**
-     * Añadir registro.
-     *
-     * @param registro the registro
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    public void añadirRegistro(RegistroCSV registro) throws IOException {
-        datos.add(registro);
-        escribirLineaTemporal(registro);
-        cambiosSinGuardar = true;
-    }
-
-    /**
-     * Escribir linea temporal.
-     *
-     * @param r the r
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private void escribirLineaTemporal(RegistroCSV r) throws IOException {
-        try (BufferedWriter bw = new BufferedWriter(
-                new FileWriter(archivoTemporal, true))) {
-
-            bw.newLine();
-            bw.write(r.toCSV(separador));
-        }
-    }
-
-    /* ===============================
-       GUARDADO
-       =============================== */
-
-    /**
-     * Guardar como.
-     *
-     * @param destino the destino
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    public void guardarComo(File destino) throws IOException {
-        Files.copy(
-            archivoTemporal.toPath(),
-            destino.toPath(),
-            java.nio.file.StandardCopyOption.REPLACE_EXISTING
-        );
-        cambiosSinGuardar = false;
-    }
-
-    /**
-     * Marcar como guardado.
-     */
-    public void marcarComoGuardado() {
-        cambiosSinGuardar = false;
-    }
-
-    /* ===============================
-       TEMPORAL
-       =============================== */
-
-    /**
-     * Crear temporal.
-     *
-     * @param original the original
-     * @return the file
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private File crearTemporal(File original) throws IOException {
-        File temp = File.createTempFile("csv_temp_", ".csv");
-        Files.copy(
-            original.toPath(),
-            temp.toPath(),
-            java.nio.file.StandardCopyOption.REPLACE_EXISTING
-        );
-        return temp;
-    }
-
-    /**
-     * Limpiar temporal.
-     */
-    public void limpiarTemporal() {
-        if (archivoTemporal != null && archivoTemporal.exists()) {
-            archivoTemporal.deleteOnExit();
-        }
-    }
-
-    /* ===============================
-       UTILIDADES
-       =============================== */
-
-    /**
-     * Detectar separador.
-     *
-     * @param archivo the archivo
-     * @return the char
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private char detectarSeparador(File archivo) throws IOException {
-        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-            String linea = br.readLine();
-            if (linea.contains(";")) return ';';
-            return ',';
-        }
-    }
-
-    /**
-     * Hay cambios sin guardar.
-     *
-     * @return true, if successful
+     * Devuelve true si hay datos nuevos que no se han guardado en un archivo definitivo.
      */
     public boolean hayCambiosSinGuardar() {
         return cambiosSinGuardar;
     }
 
     /**
-     * Gets the datos.
-     *
-     * @return the datos
+     * Restablece el flag de cambios. Se usa tras guardar con éxito.
      */
-    public ObservableList<RegistroCSV> getDatos() {
-        return datos;
+    public void marcarComoGuardado() {
+        this.cambiosSinGuardar = false;
     }
+
+    /* ============================================================
+       GESTIÓN DE ARCHIVOS
+       ============================================================ */
+
+    public void cargarCSV(File archivo) throws IOException {
+        this.separador = detectarSeparador(archivo);
+        this.archivoTemporal = crearTemporal(archivo);
+
+        datos.clear();
+        leerCSV(archivoTemporal);
+        this.cambiosSinGuardar = false;
+    }
+
+    private void leerCSV(File archivo) throws IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            boolean esCabecera = true;
+            while ((linea = br.readLine()) != null) {
+                if (linea.trim().isEmpty()) continue;
+                
+                // Salto de cabecera inteligente
+                if (esCabecera && (linea.toUpperCase().contains("CIF") || linea.toUpperCase().contains("PRODUCTO"))) {
+                    esCabecera = false;
+                    continue;
+                }
+                esCabecera = false;
+
+                String[] campos = linea.split(String.valueOf(separador));
+                RegistroCSV registro = RegistroCSV.fromArray(campos);
+                if (registro != null) datos.add(registro);
+            }
+        }
+    }
+
+    public void añadirRegistro(RegistroCSV registro) throws IOException {
+        if (registro != null) {
+            datos.add(registro);
+            escribirLineaTemporal(registro);
+            this.cambiosSinGuardar = true; // Marcamos que hay trabajo sin persistir
+        }
+    }
+
+    private void escribirLineaTemporal(RegistroCSV r) throws IOException {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(archivoTemporal, true))) {
+            bw.newLine();
+            bw.write(r.toCSV(separador));
+        }
+    }
+
+    public void guardarComo(File destino) throws IOException {
+        if (archivoTemporal != null && archivoTemporal.exists()) {
+            Files.copy(archivoTemporal.toPath(), destino.toPath(), 
+                       java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            this.cambiosSinGuardar = false;
+        }
+    }
+
+    /* ============================================================
+       TRANSFORMACIÓN Y UTILIDADES
+       ============================================================ */
 
     /**
-     * Gets the separador.
-     *
-     * @return the separador
-     */
-    public char getSeparador() {
-        return separador;
-    }
-
-    /**
-     * Gets the archivo temporal.
-     *
-     * @return the archivo temporal
-     */
-    public File getArchivoTemporal() {
-        return archivoTemporal;
-    }
-
-    /* ===============================
-       NUEVO MÉTODO PARA VENTAS
-       =============================== */
-
- /**
-     * Devuelve la lista de Ventas a partir de los registros CSV,
-     * filtrando registros nulos o con ID nulo para evitar NullPointerException.
-     *
-     * @return the list
+     * Convierte los registros planos en objetos Venta con lógica de negocio.
      */
     public List<Venta> obtenerVentas() {
-    	
-    	Map<String, Alumno> alumnosMap = new HashMap<>();
-    	
+        Map<String, Alumno> alumnosMap = new HashMap<>();
+        
         return datos.stream()
                 .filter(r -> r != null && r.getId() != null)
                 .map(r -> {
-                	
-                	Alumno alumnoUnificado = alumnosMap.computeIfAbsent(r.getCif().trim(), cifLimpio ->
-                	new Alumno(0L, cifLimpio, r.getNombre().trim(), r.getEmail().trim())
-                	);
-                	
-                	return new Venta( 
-                			Long.valueOf(r.getId()), 
-                			alumnoUnificado,
-                			r.getProducto(),
-                			r.getPrecio(),
-                			r.getFecha()
-                			);})
-                	.collect(Collectors.toList());
+                    Alumno alumnoUnificado = alumnosMap.computeIfAbsent(r.getCif().trim(), cifLimpio ->
+                        new Alumno(0L, cifLimpio, r.getNombre().trim(), r.getEmail().trim())
+                    );
+                    
+                    // r.getProducto() ya devuelve un Record Producto
+                    return new Venta( 
+                            Long.valueOf(r.getId()), 
+                            alumnoUnificado,
+                            r.getProducto(), 
+                            r.getPrecio(),
+                            r.getFecha()
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
+    private File crearTemporal(File original) throws IOException {
+        File temp = File.createTempFile("app_ventas_temp_", ".csv");
+        Files.copy(original.toPath(), temp.toPath(), 
+                   java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        return temp;
+    }
 
+    private char detectarSeparador(File archivo) throws IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea = br.readLine();
+            if (linea != null && linea.contains(";")) return ';';
+            return ',';
+        } catch (Exception e) {
+            return ';';
+        }
+    }
+
+    public void limpiarTemporal() {
+        if (archivoTemporal != null && archivoTemporal.exists()) {
+            archivoTemporal.deleteOnExit();
+        }
+    }
+
+    // Getters para la interfaz
+    public ObservableList<RegistroCSV> getDatos() { return datos; }
+    public char getSeparador() { return separador; }
+    public File getArchivoTemporal() { return archivoTemporal; }
 }
-
-

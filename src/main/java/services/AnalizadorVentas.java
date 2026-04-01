@@ -5,39 +5,28 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import models.ClienteEstadistica;
 import models.Venta;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class AnalizadorVentas.
+ * Clase encargada de procesar los datos de ventas y generar estadísticas.
  */
 public class AnalizadorVentas {
 
-	/** The datos. */
 	private List<Venta> datos;
 
-	/**
-	 * Instantiates a new analizador ventas.
-	 *
-	 * @param datos the datos
-	 */
 	public AnalizadorVentas(List<Venta> datos) {
-		this.datos = datos;
+		this.datos = (datos != null) ? datos : new ArrayList<>();
 	}
 
 	/**
-	 * Obtener total clientes.
-	 *
-	 * @return the int
+	 * Cuenta cuántos clientes únicos existen (basado en CIF).
 	 */
 	public int obtenerTotalClientes() {
-		if (datos == null || datos.isEmpty()) return 0;
+		if( datos.isEmpty()) return 0;
 		
 		return (int) datos.stream()
 				.map(Venta::getCif)
@@ -46,159 +35,101 @@ public class AnalizadorVentas {
 	}
 
 	/**
-	 * Total.
-	 *
-	 * @param columna the columna
-	 * @return the double
+	 * Suma total de la facturación.
 	 */
 	public double total(String columna) {
-		if (datos == null||datos.isEmpty())
-			return 0;
-		if (columna.equalsIgnoreCase("Precio")) {
+		if(datos.isEmpty()) return 0;
+		
+		if(columna.equalsIgnoreCase("Precio")) {
 			double suma = datos.stream()
 					.mapToDouble(Venta::getPrecio)
 					.sum();
-			
-			BigDecimal bd = BigDecimal.valueOf(suma);
-			bd = bd.setScale(2, RoundingMode.HALF_UP); // redondeo a 2 decimales
-			return bd.doubleValue();
+			return redondear(suma);
 		}
-
+		
 		return 0;
 	}
 	
-	/**
-	 * Obtener total ventas.
-	 *
-	 * @return the int
-	 */
 	public int obtenerTotalVentas() {
-		return datos != null ? datos.size(): 0;
+		return datos.size();
 	}
 
 	/**
-	 * Promedio.
-	 *
-	 * @param columna the columna
-	 * @return the double
+	 * Gasto promedio por cliente único.
 	 */
 	public double promedio(String columna) {
-		int clientes = obtenerTotalClientes();
-		if(clientes == 0) return 0;
+		int totalClientes = obtenerTotalClientes();
+		if(totalClientes == 0) return 0;
+		
 		double facturacionTotal = total(columna);
-
-		double promedioPorCliente = facturacionTotal / clientes;
-		
-		BigDecimal bd = BigDecimal.valueOf(promedioPorCliente);
-		bd = bd.setScale(2, RoundingMode.HALF_UP);
-		
-		return bd.doubleValue();
+		return redondear(facturacionTotal / totalClientes);
 	}
 
 	/**
-	 * Flujo ventas por producto.
-	 *
-	 * @param productos the productos
-	 * @return the int
+	 * Cuenta cuántas veces se ha vendido un producto específico.
 	 */
-	public int flujoVentasPorProducto(String productos) {
+	public int flujoVentasPorProducto(String nombreProducto) {
+		if(datos.isEmpty() || nombreProducto == null) return 0;
 		
-		if (datos == null||datos.isEmpty())
-			return 0;
-
-		int contador = 0;
-
-		for (Venta v : datos) {
-			if (v.getProducto().equalsIgnoreCase(productos)) {
-				contador++;
-			}
-		}
-		return contador;
+		return (int) datos.stream()
+				.filter(v -> v.getProducto().nombre().equalsIgnoreCase(nombreProducto))
+				.count();
 	}
 	
 	/**
-	 * Flujo facturacion producto.
-	 *
-	 * @param productos the productos
-	 * @return the double
+	 * Suma la facturación total de un producto específico.
 	 */
-	public double flujoFacturacionProducto(String productos) {
-		if(datos == null||datos.isEmpty()) return 0;
+	public double flujoFacturacionProducto(String nombreProducto) {
+		if(datos.isEmpty() || nombreProducto == null) return 0;
 		
-		List<Venta> lista = new ArrayList<>();
-		
-		for(Venta v: datos) {
-			if(v.getProducto().equalsIgnoreCase(productos)) {
-				lista.add(v);
-			}
-		}
-		
-		double suma = lista.stream()
+		double suma = datos.stream()
+				.filter(v -> v.getProducto().nombre().equalsIgnoreCase(nombreProducto))
 				.mapToDouble(Venta::getPrecio)
 				.sum();
 		
-		BigDecimal bd = BigDecimal.valueOf(suma);
-		bd = bd.setScale(2, RoundingMode.HALF_UP);
-		
-		return bd.doubleValue();
+		return redondear(suma);
 	}
 	
 	/**
-	 * Ranking clientes.
-	 *
-	 * @return the list
+	 * Genera el ranking de clientes agrupando por CIF y ordenando de MAYOR a MENOR compras.
 	 */
-	// Retorna todos los clientes ordenados por número de compras (descendente)
+	
 	public List<ClienteEstadistica> rankingClientes() {
 	    if (datos == null || datos.isEmpty()) return Collections.emptyList();
 
-	    // Agrupar por CIF
-	    Map<String, List<Venta>> agrupado = datos.stream()
-	            .collect(Collectors.groupingBy(Venta::getCif));
-
-	    // Convertir a lista de ClienteEstadistica
-	    List<ClienteEstadistica> ranking = agrupado.entrySet().stream()
+	    return datos.stream()
+	            .collect(Collectors.groupingBy(Venta::getCif)) // Agrupamos por CIF
+	            .entrySet().stream()
 	            .map(entry -> {
-	                Venta v = entry.getValue().get(0); // Tomamos nombre y email del primer registro
+	                Venta muestra = entry.getValue().get(0);
 	                return new ClienteEstadistica(
-	                        v.getNombre(),
-	                        v.getEmail(),
-	                        entry.getValue().size()
+	                        entry.getKey(),
+	                        muestra.getNombre(),
+	                        muestra.getEmail(),
+	                        (long) entry.getValue().size()
 	                );
 	            })
-	            .sorted(Comparator.comparingLong(ClienteEstadistica::getTotalCompras))
-	            .toList();
-
-	    return ranking;
+	            .sorted(Comparator.comparingLong(ClienteEstadistica::totalCompras).reversed())
+	            .collect(Collectors.toList());
 	}
 
 	/**
-	 * Top clientes.
-	 *
-	 * @param n the n
-	 * @return the list
+	 * Retorna los N mejores clientes.
 	 */
-	// Retorna solo los N clientes con más compras
 	public List<ClienteEstadistica> topClientes(int n) {
 	    return rankingClientes().stream()
 	            .limit(n)
-	            .toList();
+	            .collect(Collectors.toList());
 	}
 	
+	
+	/**
+	 * Método utilitario para centralizar el redondeo a 2 decimales.
+	 */
+	private double redondear(double valor) {
+		return BigDecimal.valueOf(valor)
+				.setScale(2, RoundingMode.HALF_UP)
+				.doubleValue();
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

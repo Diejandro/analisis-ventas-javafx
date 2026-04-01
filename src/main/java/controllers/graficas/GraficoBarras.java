@@ -10,28 +10,18 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 
 /**
- * Clase encargada de gestionar el gráfico de barras.
+ * Clase encargada de gestionar el gráfico de barras para visualizar 
+ * el volumen de ventas por nivel de curso.
  */
 public class GraficoBarras {
 
-    /** The bar chart. */
     private BarChart<String, Number> barChart;
-    
-    /** The eje Y. */
     private NumberAxis ejeY;
-    
-    /** The analizador. */
     private AnalizadorVentas analizador;
-    
-    /** The datos service. */
     private DatosCSVService datosService;
 
     /**
-     * Constructor.
-     *
-     * @param barChart the bar chart
-     * @param ejeX the eje X
-     * @param ejeY the eje Y
+     * Constructor del gestor de gráfico de barras.
      */
     public GraficoBarras(BarChart<String, Number> barChart, CategoryAxis ejeX, NumberAxis ejeY) {
         this.barChart = barChart;
@@ -41,137 +31,108 @@ public class GraficoBarras {
     }
 
     /**
-     * Configura las propiedades iniciales del gráfico de barras.
+     * Configura las propiedades visuales y de escala del gráfico.
      */
     private void configurarGraficoBarras() {
+        if (barChart == null) return;
+        
         barChart.setLegendVisible(false); 
         barChart.setAnimated(true);
 
+        ejeY.setLabel("Cantidad de Ventas");
         ejeY.setAutoRanging(true);
         ejeY.setMinorTickVisible(false);
-        ejeY.setTickUnit(1); 
+        
+        // Formateador para asegurar que el eje Y solo muestre números enteros (ventas)
+        ejeY.setTickLabelFormatter(new NumberAxis.DefaultFormatter(ejeY) {
+            @Override
+            public String toString(Number object) {
+                return String.format("%d", object.intValue());
+            }
+        });
     }
 
-    /**
-     * Carga los datos y actualiza el gráfico.
-     *
-     * @param analizador the analizador
-     */
     public void cargarDatos(AnalizadorVentas analizador) {
         this.analizador = analizador;
         actualizarGraficoBarras();
     }
 
     /**
-     * Actualiza el gráfico de barras con las ventas por producto.
-     * <p>
-     * Limpia los elementos dentro de la barra, y cuando se encuentren los datos presentes,
-     * completa las barras dandoles contenido y forma.
+     * Procesa los datos del analizador y los vuelca en el gráfico.
+     * Mantiene un orden fijo: Básico -> Intermedio -> Avanzado.
      */
     private void actualizarGraficoBarras() {
-        if (analizador == null) return;
+        if (analizador == null || barChart == null) return;
 
         barChart.getData().clear();
 
         XYChart.Series<String, Number> serie = new XYChart.Series<>();
-        String[] productosOrdenados = {"Curso básico", "Curso intermedio", "Curso avanzado"};
+        
+        // CORRECCIÓN: Nombres sincronizados con el CSV (Mayúsculas)
+        String[] niveles = {"Curso Básico", "Curso Intermedio", "Curso Avanzado"};
 
-        int maxCantidad = 0;
-        for (String producto : productosOrdenados) {
-            int cantidad = analizador.flujoVentasPorProducto(producto);
-            if (cantidad > maxCantidad) maxCantidad = cantidad;
-            serie.getData().add(new XYChart.Data<>(producto, cantidad));
+        for (String curso : niveles) {
+            int cantidad = analizador.flujoVentasPorProducto(curso);
+            serie.getData().add(new XYChart.Data<>(curso, cantidad));
         }
 
         barChart.getData().add(serie);
 
-        ejeY.setTickLabelFormatter(new NumberAxis.DefaultFormatter(ejeY) {
-            @Override
-            public String toString(Number object) {
-                return String.valueOf(object.intValue());
-            }
-        });
-
+        // Aplicamos los colores corporativos a las barras
         aplicarColoresBarras(serie);
     }
 
     /**
-     * Establece al gráfico un orden específico.
-     *
-     */
-    public void actualizarGraficoOrdenado() {
-        if (analizador == null) return;
-
-        barChart.getData().clear();
-        String[] productosOrdenados = {"Curso básico", "Curso intermedio", "Curso avanzado"};
-        XYChart.Series<String, Number> serie = new XYChart.Series<>();
-
-        for (String producto : productosOrdenados) {
-            int cantidad = analizador.flujoVentasPorProducto(producto);
-            serie.getData().add(new XYChart.Data<>(producto, cantidad));
-        }
-
-        barChart.getData().add(serie);
-    }
-
-    /**
-     * Restaura gráfico al modo ventas.
+     * Restaura el gráfico a su estado de visualización de ventas.
      */
     public void restaurarGraficoVentas() {
-        barChart.setTitle("Ventas por Producto");
-        ejeY.setLabel("Cantidad de Ventas");
-        actualizarGraficoBarras();
+        if (barChart != null) {
+            barChart.setTitle("Volumen de Ventas por Nivel");
+            actualizarGraficoBarras();
+        }
     }
 
-    /**
-     * Limpia el gráfico para que no se solapen.
-     */
     public void limpiar() {
         if (barChart != null) barChart.getData().clear();
-        analizador = null;
+        this.analizador = null;
     }
 
     /**
-     * Actualiza solo el gráfico cada vez que se modifiquen los datos.
+     * Sincroniza el gráfico con el estado actual del servicio de datos.
      */
     public void actualizar() {
         if (analizador != null) {
             actualizarGraficoBarras();
         } else if (!datosService.obtenerVentas().isEmpty()) {
-            analizador = new AnalizadorVentas(datosService.obtenerVentas());
+            this.analizador = new AnalizadorVentas(datosService.obtenerVentas());
             actualizarGraficoBarras();
         }
     }
 
     /**
-     * Aplicar colores barras.
-     *
-     * @param serie the serie
+     * Asigna colores específicos a cada barra para facilitar la lectura visual.
      */
     private void aplicarColoresBarras(XYChart.Series<String, Number> serie) {
+        // Necesario usar Platform.runLater porque los nodos de las barras 
+        // se crean justo después de añadir la serie al gráfico.
         Platform.runLater(() -> {
             for (int i = 0; i < serie.getData().size(); i++) {
                 XYChart.Data<String, Number> dato = serie.getData().get(i);
                 Node barra = dato.getNode();
+                
                 if (barra != null) {
-                    String color;
-                    switch (i) {
-                        case 0: color = "#ff4d4d"; break; 
-                        case 1: color = "#4da6ff"; break; 
-                        case 2: color = "#6dd56d"; break; 
-                        default: color = "#ffaa00"; break;
-                    }
+                    String color = switch (i) {
+                        case 0 -> "#4da8da"; // Azul claro (Básico)
+                        case 1 -> "#0e1a2a"; // Azul oscuro (Intermedio)
+                        case 2 -> "#2c3e50"; // Gris azulado (Avanzado)
+                        default -> "#bfc9d6";
+                    };
                     barra.setStyle("-fx-bar-fill: " + color + ";");
                 }
             }
         });
     }
 
-    /**
-     * Gets the bar chart.
-     *
-     * @return the bar chart
-     */
     public BarChart<String, Number> getBarChart() {
         return barChart;
     }

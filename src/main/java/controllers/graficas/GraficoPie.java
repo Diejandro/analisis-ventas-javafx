@@ -1,6 +1,7 @@
 package controllers.graficas;
 
 import models.Venta;
+import models.Producto; // Import necesario
 import services.AnalizadorVentas;
 import services.DatosCSVService;
 import javafx.collections.FXCollections;
@@ -11,25 +12,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// TODO: Auto-generated Javadoc
 /**
- * Clase que gestiona un PieChart de facturación por producto.
+ * Clase que gestiona la visualización y actualización del gráfico de sectores (PieChart).
+ * Representa la distribución de la facturación por cada producto.
  */
 public class GraficoPie {
 
-    /** The pie chart. */
     private PieChart pieChart;
-    
-    /** The analizador. */
     private AnalizadorVentas analizador;
-    
-    /** The datos service. */
     private DatosCSVService datosService;
 
     /**
-     * Constructor.
-     *
-     * @param pieChart the pie chart
+     * Constructor que vincula el componente de la vista y prepara el servicio de datos.
+     * * @param pieChart El componente PieChart definido en el FXML.
      */
     public GraficoPie(PieChart pieChart) {
         this.pieChart = pieChart;
@@ -38,19 +33,21 @@ public class GraficoPie {
     }
 
     /**
-     * Configura las propiedades iniciales del gráfico.
+     * Establece la configuración visual inicial del gráfico.
      */
     private void configurarGraficoPie() {
-        pieChart.setLegendVisible(true);
-        pieChart.setClockwise(true);
-        pieChart.setLabelsVisible(true);
-        pieChart.setStartAngle(90);
+        if (pieChart != null) {
+            pieChart.setLegendVisible(true);
+            pieChart.setClockwise(true);
+            pieChart.setLabelsVisible(true);
+            pieChart.setStartAngle(90);
+            pieChart.setTitle("Distribución de Facturación");
+        }
     }
 
     /**
-     * Carga los datos en el gráfico.
-     *
-     * @param analizador the analizador
+     * Carga un nuevo analizador y refresca los datos visuales.
+     * * @param analizador El analizador con la lista de ventas actualizada.
      */
     public void cargarDatos(AnalizadorVentas analizador) {
         this.analizador = analizador;
@@ -58,80 +55,85 @@ public class GraficoPie {
     }
 
     /**
-     * Actualiza el gráfico de pie sumando facturación por producto.
+     * Procesa las ventas para agrupar la facturación por nombre de producto
+     * y genera las porciones (slices) del gráfico.
      */
     private void actualizarGraficoPie() {
-        if (analizador == null) {
-            System.out.println("No hay analizador configurado");
+        if (analizador == null || pieChart == null) {
             return;
         }
 
         pieChart.getData().clear();
 
-        // Obtener ventas
+        // Obtener ventas actuales desde el servicio
         List<Venta> ventas = datosService.obtenerVentas();
 
-        // Productos únicos y su facturación
-        Map<String, Double> facturacionPorProducto = new HashMap<>();
-        ventas.stream()
-                .map(Venta::getProducto)
-                .filter(p -> p != null && !p.isBlank())
-                .distinct()
-                .forEach(producto -> facturacionPorProducto.put(producto, analizador.flujoFacturacionProducto(producto)));
-
-        if (facturacionPorProducto.isEmpty()) {
-            System.out.println("No hay datos para graficar");
+        if (ventas.isEmpty()) {
             return;
         }
 
-        // Crear lista de datos para PieChart
-        ObservableList<PieChart.Data> listaDatos = FXCollections.observableArrayList();
+        // Mapa para acumular la facturación por NOMBRE de producto
+        Map<String, Double> facturacionPorProducto = new HashMap<>();
 
-        double totalFacturacion = facturacionPorProducto.values().stream()
+        // CORRECCIÓN: Extraemos el nombre del Record Producto para que Analizador lo entienda
+        ventas.stream()
+                .map(Venta::getProducto) // Obtenemos el objeto Producto
+                .filter(p -> p != null && !p.nombre().isBlank()) // Validamos el Record
+                .map(Producto::nombre) // Nos quedamos solo con el String del nombre
+                .distinct()
+                .forEach(nombre -> {
+                    double totalProducto = analizador.flujoFacturacionProducto(nombre);
+                    if (totalProducto > 0) {
+                        facturacionPorProducto.put(nombre, totalProducto);
+                    }
+                });
+
+        if (facturacionPorProducto.isEmpty()) {
+            return;
+        }
+
+        // Calcular el total para obtener porcentajes
+        double sumaTotal = facturacionPorProducto.values().stream()
                 .mapToDouble(Double::doubleValue)
                 .sum();
 
-        facturacionPorProducto.forEach((producto, valor) -> {
-            double porcentaje = (valor / totalFacturacion) * 100;
-            PieChart.Data slice = new PieChart.Data(producto + " (" + String.format("%.1f%%", porcentaje) + ")", valor);
-            listaDatos.add(slice);
+        ObservableList<PieChart.Data> listaDatos = FXCollections.observableArrayList();
+
+        // Crear las porciones del gráfico
+        facturacionPorProducto.forEach((nombre, valor) -> {
+            double porcentaje = (valor / sumaTotal) * 100;
+            // Etiqueta con nombre y porcentaje formateado
+            String etiqueta = String.format("%s (%.1f%%)", nombre, porcentaje);
+            listaDatos.add(new PieChart.Data(etiqueta, valor));
         });
 
         pieChart.setData(listaDatos);
-        //System.out.println("✓ Gráfico de pie actualizado con " + facturacionPorProducto.size() + " productos");
     }
 
     /**
-     * Limpia el gráfico.
+     * Limpia los datos del gráfico y el analizador.
      */
     public void limpiar() {
-        if (pieChart != null) pieChart.getData().clear();
-        analizador = null;
+        if (pieChart != null) {
+            pieChart.getData().clear();
+        }
+        this.analizador = null;
     }
 
     /**
-     * Refresca el gráfico.
+     * Sincroniza el gráfico con el estado actual del servicio de datos.
      */
     public void actualizar() {
-        if (analizador != null) {
+        List<Venta> ventas = datosService.obtenerVentas();
+        if (!ventas.isEmpty()) {
+            this.analizador = new AnalizadorVentas(ventas);
             actualizarGraficoPie();
         } else {
-            List<Venta> ventas = datosService.obtenerVentas();
-            if (!ventas.isEmpty()) {
-                analizador = new AnalizadorVentas(ventas);
-                actualizarGraficoPie();
-            }
+            limpiar();
         }
     }
 
-    /**
-     * Devuelve el PieChart.
-     *
-     * @return the pie chart
-     */
     public PieChart getPieChart() {
         return pieChart;
     }
 }
-
-

@@ -15,41 +15,43 @@ import javafx.scene.control.ButtonType;
 import services.DatosCSVService;
 
 /**
- * The Class Main.
+ * Clase principal de la aplicación ESL.
+ * Gestiona el ciclo de vida de la ventana principal y la persistencia al cerrar.
  */
 public class Main extends Application {
 
-    /**
-     * Start.
-     *
-     * @param primaryStage the primary stage
-     * @throws Exception the exception
-     */
     @Override
     public void start(Stage primaryStage) throws Exception {
 
+        // Carga de la vista principal
         FXMLLoader loader = new FXMLLoader(
             getClass().getResource("/fxml/VentanaAnalisis.fxml")
         );
         Parent root = loader.load();
 
+        // Configuración de la escena
         primaryStage.setTitle("ESL (English School Learning)");
         primaryStage.setScene(new Scene(root));
+        
+        // Dimensiones mínimas según diseño
         primaryStage.setMinWidth(1315);
         primaryStage.setMinHeight(810);
         primaryStage.setResizable(true);
 
+        /**
+         * Gestión del cierre de la aplicación.
+         * Verifica si hay datos en el temporal que deban persistirse en un CSV real.
+         */
         primaryStage.setOnCloseRequest(event -> {
-
             DatosCSVService service = DatosCSVService.getInstance();
 
-            // 1. Comprobar cambios sin guardar
+            // 1. Comprobar si hay cambios en el archivo temporal sin guardar en disco
             if (service.hayCambiosSinGuardar()) {
 
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Cambios sin guardar");
-                alert.setHeaderText("Existen datos añadidos que no se han guardado");
-                alert.setContentText("¿Desea guardarlos antes de salir?");
+                alert.setHeaderText("Existen datos añadidos que no se han guardado permanentemente");
+                alert.setContentText("¿Desea guardarlos en un archivo CSV antes de salir?");
 
                 ButtonType btnGuardar = new ButtonType("Guardar");
                 ButtonType btnSalir = new ButtonType("Salir sin guardar");
@@ -60,13 +62,11 @@ public class Main extends Application {
                 Optional<ButtonType> resultado = alert.showAndWait();
 
                 if (resultado.isPresent()) {
-
                     if (resultado.get() == btnGuardar) {
-
                         FileChooser chooser = new FileChooser();
-                        chooser.setTitle("Guardar archivo CSV");
+                        chooser.setTitle("Guardar archivo CSV final");
                         chooser.getExtensionFilters().add(
-                            new FileChooser.ExtensionFilter("CSV", "*.csv")
+                            new FileChooser.ExtensionFilter("Archivos CSV (*.csv)", "*.csv")
                         );
 
                         File destino = chooser.showSaveDialog(primaryStage);
@@ -76,24 +76,25 @@ public class Main extends Application {
                                 service.guardarComo(destino);
                                 service.marcarComoGuardado();
                             } catch (IOException e) {
-                                e.printStackTrace();
-                                event.consume();
+                                mostrarErrorCierre("No se pudo guardar el archivo: " + e.getMessage());
+                                event.consume(); // Bloquea el cierre si hay error
                                 return;
                             }
                         } else {
+                            // Si el usuario cancela el FileChooser, no cerramos la app
                             event.consume();
                             return;
                         }
 
                     } else if (resultado.get() == btnCancelar) {
+                        // Si el usuario pulsa cancelar en el diálogo, no cerramos
                         event.consume();
                         return;
                     }
-                    // btnSalir → continuar cierre
                 }
             }
 
-            // 2. Limpieza segura del archivo temporal
+            // 2. Limpieza del archivo temporal del sistema antes de salir definitivamente
             service.limpiarTemporal();
         });
 
@@ -101,12 +102,16 @@ public class Main extends Application {
     }
 
     /**
-     * The main method.
-     *
-     * @param args the arguments
+     * Utilidad para mostrar errores durante el proceso de cierre.
      */
+    private void mostrarErrorCierre(String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error al salir");
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
 }
-

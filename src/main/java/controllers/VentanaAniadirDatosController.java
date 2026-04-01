@@ -1,153 +1,116 @@
 package controllers;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import models.Producto;
 import models.RegistroCSV;
 import services.DatosCSVService;
 
 /**
- * The Class VentanaAniadirDatosController.
+ * Controlador para la ventana de inserción de nuevos registros.
+ * Gestiona la validación de campos y la persistencia temporal de la nueva venta.
  */
 public class VentanaAniadirDatosController {
 
-    /** The btn cerrar. */
-    @FXML
-    private Button btn_Cerrar;
-
-    /** The btn aniadir. */
-    @FXML
-    private Button btn_aniadir;
-
-    /** The btn producto. */
-    @FXML
-    private MenuButton btn_producto;
-
-    /** The dp fecha. */
-    @FXML
-    private DatePicker dp_fecha;
-
-    /** The lbl precio. */
-    @FXML
-    private Label lbl_precio;
-
-    /** The tf cif. */
-    @FXML
-    private TextField tf_Cif;
-
-    /** The tf email. */
-    @FXML
-    private TextField tf_Email;
-
-    /** The tf ID. */
-    @FXML
-    private TextField tf_ID;
-
-    /** The tf nombre. */
-    @FXML
-    private TextField tf_Nombre;
+    @FXML private Button btn_Cerrar;
+    @FXML private Button btn_aniadir;
+    @FXML private MenuButton btn_producto;
+    @FXML private DatePicker dp_fecha;
+    @FXML private Label lbl_precio;
+    @FXML private TextField tf_Cif;
+    @FXML private TextField tf_Email;
+    @FXML private TextField tf_ID;
+    @FXML private TextField tf_Nombre;
 
     /**
-     * Maneja el evento de clic sobre el botón "Añadir"
-     * <p>
-     * Al activarse, comprueba que todos los campos de la vista esté cumplimentados
-     * para después añadir los datos.
-     *
-     * @param event evento de ratón generado al hacer clic sobre el elemento asociado
+     * Maneja la acción de añadir un nuevo registro.
+     * Valida los campos, crea los objetos necesarios y los guarda a través del servicio.
      */
     @FXML
     void agregarDato(ActionEvent event) {
 
         if (!camposValidos()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Campos incompletos");
-            alert.setHeaderText(null);
-            alert.setContentText("Debe completar todos los campos antes de añadir.");
-            alert.showAndWait();
+            mostrarAlerta(Alert.AlertType.WARNING, "Campos incompletos", 
+                         "Debe completar todos los campos antes de añadir.");
             return;
         }
 
-        // Parsear precio
+        // 1. Procesar el precio desde el Label
         double precio;
         try {
-            precio = Double.parseDouble(
-                    lbl_precio.getText().replace("€", "").replace(",", ".").trim()
-            );
+            String textoPrecio = lbl_precio.getText()
+                    .replace("€", "")
+                    .replace(",", ".")
+                    .trim();
+            precio = Double.parseDouble(textoPrecio);
         } catch (NumberFormatException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Precio inválido");
-            alert.setHeaderText(null);
-            alert.setContentText("El precio no es válido.");
-            alert.showAndWait();
+            mostrarAlerta(Alert.AlertType.ERROR, "Precio inválido", 
+                         "El formato del precio no es correcto.");
             return;
         }
 
-        // Crear registro
+        // 2. Crear el objeto Producto (Basado en el Record)
+        // Esto es lo que permite la extendibilidad que buscamos
+        Producto productoSeleccionado = new Producto(btn_producto.getText().trim());
+
+        // 3. Crear el RegistroCSV con el nuevo objeto Producto
         RegistroCSV nuevoRegistro = new RegistroCSV(
                 tf_ID.getText().trim(),
                 tf_Nombre.getText().trim(),
                 tf_Cif.getText().trim(),
                 tf_Email.getText().trim(),
-                btn_producto.getText().trim(),
+                productoSeleccionado, // Pasamos el objeto, no el String
                 precio,
                 dp_fecha.getValue()
         );
 
         try {
-            // Añadir al CSV temporal
+            // Guardar en el servicio (CSV temporal)
             DatosCSVService.getInstance().añadirRegistro(nuevoRegistro);
 
-            // Limpiar campos para nuevo ingreso
+            // Éxito y limpieza
+            mostrarAlerta(Alert.AlertType.INFORMATION, "Registro añadido", 
+                         "La venta se ha registrado correctamente.");
             limpiarCampos();
 
         } catch (IOException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error al añadir");
-            alert.setHeaderText(null);
-            alert.setContentText("No se pudo añadir el registro al CSV temporal.");
-            alert.showAndWait();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error al guardar", 
+                         "No se pudo escribir en el archivo temporal.");
         }
     }
 
     /**
-     * Realiza una comprobación de que todos los campos del formulario estén debidamente cumplimentados.
-     *
-     * @return true, si todos los elementos se encuentran completos
+     * Verifica que no haya campos vacíos y que se haya seleccionado un producto.
      */
-
     private boolean camposValidos() {
         return !tf_ID.getText().isBlank()
                 && !tf_Nombre.getText().isBlank()
                 && !tf_Cif.getText().isBlank()
                 && !tf_Email.getText().isBlank()
-                && btn_producto.getText() != null && !btn_producto.getText().isBlank()
+                && btn_producto.getText() != null 
+                && !btn_producto.getText().equals("Producto") // Evita el texto por defecto
                 && !lbl_precio.getText().isBlank()
                 && dp_fecha.getValue() != null;
     }
 
     /**
-     *  Gestiona que los cambos una vez añadidos, vuelvan a estar vacíos para introducir más si fuera necesario.
+     * Restablece el formulario a su estado inicial.
      */
-
     private void limpiarCampos() {
         tf_ID.clear();
         tf_Nombre.clear();
         tf_Cif.clear();
         tf_Email.clear();
-        btn_producto.setText("Producto"); // texto por defecto
+        btn_producto.setText("Producto");
         lbl_precio.setText("0,0€");
-        dp_fecha.setValue(null);
+        dp_fecha.setValue(LocalDate.now()); // Por defecto la fecha de hoy
     }
-
-    /**
-     * Gestiona el evento que permite cerrar la ventana cuando ya no se requiera su uso.
-     *
-     * @param event evento de ratón generado al hacer clic sobre el elemento asociado
-     */
 
     @FXML
     void cerrarVentana(ActionEvent event) {
@@ -156,22 +119,31 @@ public class VentanaAniadirDatosController {
     }
 
     /**
-     * Maneja el evento de clic sobre el menú desplegable "Productos"
-     * <p>
-     * Despliega las opciones a elegir, estableciendo el precio ya definido.
-     *
-     * @param event evento de ratón generado al hacer clic sobre el elemento asociado
+     * Actualiza el texto del botón y el label de precio según la selección del usuario.
      */
-
     @FXML
     private void seleccionarProducto(ActionEvent event) {
         MenuItem item = (MenuItem) event.getSource();
-        btn_producto.setText(item.getText());
+        String seleccion = item.getText();
+        btn_producto.setText(seleccion);
 
-        switch(item.getText()) {
+        // Precios fijos según el catálogo
+        switch(seleccion) {
             case "Curso Básico" -> lbl_precio.setText("295");
             case "Curso Intermedio" -> lbl_precio.setText("495");
             case "Curso Avanzado" -> lbl_precio.setText("895");
+            default -> lbl_precio.setText("0,0");
         }
+    }
+
+    /**
+     * Utilidad interna para centralizar la creación de alertas.
+     */
+    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }

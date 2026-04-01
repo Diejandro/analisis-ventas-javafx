@@ -21,16 +21,13 @@ import services.AnalizadorVentas;
 import services.GeneradorInformeHTML;
 
 /**
- * Controlador para la vista de informe
- * Muestra el informe en formato texto plano en un TextArea
+ * Controlador para la vista de informe.
+ * Muestra el informe en formato texto plano y gestiona la exportación a HTML.
  */
 public class VentanaAnalisisInformeController {
 
-    @FXML
-    private Button b_download;
-
-    @FXML
-    private TextArea tField_infome;
+    @FXML private Button b_download;
+    @FXML private TextArea tField_infome;
 
     private List<Venta> ventasActuales;
     private GeneradorInformeHTML generador;
@@ -38,21 +35,18 @@ public class VentanaAnalisisInformeController {
     private static final DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.GERMANY);
     private static final DecimalFormat dfNumber = new DecimalFormat("#,##0.00", symbols);
 
-    /**
-     * Inicializa el controlador
-     */
     @FXML
     public void initialize() {
         if (tField_infome != null) {
             tField_infome.setEditable(false);
             tField_infome.setWrapText(true);
+            // Aplicamos fuente monoespaciada para que las columnas de texto no se desalineen
+            tField_infome.setStyle("-fx-font-family: 'Consolas', 'Monospaced', 'Courier New'; -fx-font-size: 13px;");
         }
     }
 
     /**
-     * Actualiza el contenido del informe en formato texto
-     *
-     * @param datos Lista de ventas
+     * Punto de entrada principal para actualizar la vista con nuevos datos.
      */
     public void actualizarContenido(List<Venta> datos) {
         if (datos == null || datos.isEmpty()) {
@@ -66,32 +60,24 @@ public class VentanaAnalisisInformeController {
         try {
             String textoInforme = generarInformeTextoPlano(datos);
             tField_infome.setText(textoInforme);
-            
-            System.out.println("✓ Informe de texto cargado correctamente");
-            
         } catch (Exception e) {
-            e.printStackTrace();
-            tField_infome.setText("Error al generar el informe: " + e.getMessage());
+            tField_infome.setText("Error crítico al generar el informe: " + e.getMessage());
         }
     }
 
     /**
-     * Genera el informe en formato texto plano
-     *
-     * @param datos Lista de ventas
-     * @return String con el informe en texto plano
+     * Construye la cadena de texto con formato de tabla para el TextArea.
      */
     private String generarInformeTextoPlano(List<Venta> datos) {
         StringBuilder texto = new StringBuilder();
         AnalizadorVentas av = new AnalizadorVentas(datos);
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        // Título
         texto.append("═══════════════════════════════════════════════════════════════\n");
         texto.append("          INFORME DE VENTAS - CURSOS DE INGLÉS\n");
         texto.append("═══════════════════════════════════════════════════════════════\n\n");
 
-        // Resumen general
+        // KPIs
         int totalVentas = av.obtenerTotalVentas();
         double ingresosTotales = av.total("Precio");
         double precioMedio = totalVentas > 0 ? ingresosTotales / totalVentas : 0;
@@ -104,157 +90,113 @@ public class VentanaAnalisisInformeController {
         texto.append(String.format("  Clientes únicos:     %d\n", av.obtenerTotalClientes()));
         texto.append("\n");
 
-        // Ventas por producto
+        // Agrupación por productos (Usando los nombres definidos en el CSV)
         texto.append("📦 VENTAS POR PRODUCTO\n");
         texto.append("───────────────────────────────────────────────────────────────\n");
-        String[] productos = {"Curso básico", "Curso intermedio", "Curso avanzado"};
-        for (String producto : productos) {
-            int cantidad = av.flujoVentasPorProducto(producto);
-            double facturacion = av.flujoFacturacionProducto(producto);
-            texto.append(String.format("  %-20s  %3d ventas  →  %s €\n", 
-                                      producto, cantidad, dfNumber.format(facturacion)));
+        String[] nombresProductos = {"Curso básico", "Curso intermedio", "Curso avanzado"};
+        for (String nombre : nombresProductos) {
+            int cantidad = av.flujoVentasPorProducto(nombre);
+            double facturacion = av.flujoFacturacionProducto(nombre);
+            texto.append(String.format("  %-20s  %3d ventas  →  %10s €\n", 
+                                      nombre, cantidad, dfNumber.format(facturacion)));
         }
         texto.append("\n");
 
-        // Top clientes
+        // Top 10 Clientes (Acceso a Record)
         List<ClienteEstadistica> topClientes = av.topClientes(10);
-        texto.append("🏆 TOP 10 CLIENTES (por número de compras)\n");
+        texto.append("🏆 TOP 10 CLIENTES (por volumen de compra)\n");
         texto.append("───────────────────────────────────────────────────────────────\n");
         
         int posicion = 1;
         for (ClienteEstadistica c : topClientes) {
             texto.append(String.format("%2d. %-25s  %3d compras\n", 
-                                      posicion++, c.getNombre(), c.getTotalCompras()));
-            texto.append(String.format("    Email: %s\n", c.getEmail()));
+                                      posicion++, c.nombre(), c.totalCompras()));
+            texto.append(String.format("    Email: %s\n", c.email()));
         }
         texto.append("\n");
 
-        // Listado completo de ventas
+        // Transacciones individuales
         texto.append("📋 LISTADO COMPLETO DE VENTAS\n");
         texto.append("═══════════════════════════════════════════════════════════════\n");
-        texto.append(String.format("%-5s %-25s %-15s %-20s\n", 
-                                   "ID", "Producto", "Precio", "Fecha"));
+        texto.append(String.format("%-5s %-25s %-15s %-20s\n", "ID", "Producto", "Precio", "Fecha"));
         texto.append("───────────────────────────────────────────────────────────────\n");
 
         for (Venta v : datos) {
             texto.append(String.format("%-5s %-25s %10s €  %s\n",
                                       v.getId(),
-                                      v.getProducto(),
+                                      v.getProducto().nombre(), // Acceso al Record Producto
                                       dfNumber.format(v.getPrecio()),
                                       v.getFecha().format(df)));
         }
         
-        texto.append("\n");
-        texto.append("═══════════════════════════════════════════════════════════════\n");
-        texto.append(String.format("Total de registros: %d\n", datos.size()));
-        texto.append("═══════════════════════════════════════════════════════════════\n");
-
+        texto.append("\n═══════════════════════════════════════════════════════════════\n");
         return texto.toString();
     }
 
-    /**
-     * Muestra un mensaje cuando no hay datos
-     */
-    private void mostrarMensajeVacio() {
-        tField_infome.setText("═══════════════════════════════════════════════════════════════\n"
-                            + "                    📊 NO HAY DATOS\n"
-                            + "═══════════════════════════════════════════════════════════════\n\n"
-                            + "  Carga un archivo CSV para generar el informe de ventas.\n\n");
-    }
-
-    /**
-     * Limpia el contenido
-     */
-    public void limpiar() {
-        ventasActuales = null;
-        generador = null;
-        mostrarMensajeVacio();
-    }
-
-    /**
-     * Maneja el evento clic sobre el botón "Descargar"
-     * Descarga el informe como archivo HTML
-     *
-     * @param event Evento de ratón
-     */
     @FXML
     void onClickedDownload(MouseEvent event) {
         if (ventasActuales == null || ventasActuales.isEmpty()) {
-            mostrarAdvertencia("No hay datos para generar el informe");
+            mostrarAdvertencia("No hay datos cargados para exportar.");
             return;
         }
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Guardar informe HTML");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Archivo HTML", "*.html")
-        );
-        fileChooser.setInitialFileName("informe_ventas.html");
+        fileChooser.setTitle("Exportar informe a HTML");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Web Page", "*.html"));
+        fileChooser.setInitialFileName("Informe_Ventas.html");
 
         File archivoDestino = fileChooser.showSaveDialog(tField_infome.getScene().getWindow());
 
         if (archivoDestino != null) {
             try {
                 generador.generarInforme(archivoDestino.getAbsolutePath());
-                
-                mostrarExito("Informe guardado correctamente", 
-                           "El archivo HTML se guardó en:\n" + archivoDestino.getAbsolutePath());
-                
-                System.out.println("✓ Informe HTML guardado en: " + archivoDestino.getAbsolutePath());
-                
+                mostrarExito("Exportación completada", "El informe se ha guardado en:\n" + archivoDestino.getName());
             } catch (IOException e) {
-                e.printStackTrace();
-                mostrarError("Error al guardar el archivo:\n" + e.getMessage());
+                mostrarError("No se pudo escribir el archivo: " + e.getMessage());
             }
         }
     }
 
-    /**
-     * Refresca el informe con los datos actuales
-     */
+    /* ===============================
+       MÉTODOS PRIVADOS Y UTILIDADES
+       =============================== */
+
+    private void mostrarMensajeVacio() {
+        tField_infome.setText("═══════════════════════════════════════════════════════════════\n"
+                            + "                    📊 SIN DATOS CARGADOS\n"
+                            + "═══════════════════════════════════════════════════════════════\n\n"
+                            + "  Por favor, carga un archivo CSV válido para generar el informe.\n");
+    }
+
+    public void limpiar() {
+        ventasActuales = null;
+        generador = null;
+        mostrarMensajeVacio();
+    }
+
     public void refrescar() {
-        if (ventasActuales != null && !ventasActuales.isEmpty()) {
-            actualizarContenido(ventasActuales);
-        }
+        if (ventasActuales != null) actualizarContenido(ventasActuales);
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // MÉTODOS DE MENSAJES
-    // ═══════════════════════════════════════════════════════════
-
-    private void mostrarError(String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("Ha ocurrido un error");
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+    private void mostrarError(String msj) {
+        Alert a = new Alert(Alert.AlertType.ERROR);
+        a.setTitle("Error");
+        a.setContentText(msj);
+        a.showAndWait();
     }
 
-    private void mostrarAdvertencia(String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Advertencia");
-        alert.setHeaderText("Atención");
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+    private void mostrarAdvertencia(String msj) {
+        Alert a = new Alert(Alert.AlertType.WARNING);
+        a.setTitle("Atención");
+        a.setContentText(msj);
+        a.showAndWait();
     }
 
-    private void mostrarExito(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Éxito");
-        alert.setHeaderText(titulo);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
-    }
-
-    // ═══════════════════════════════════════════════════════════
-    // GETTERS
-    // ═══════════════════════════════════════════════════════════
-
-    public List<Venta> getVentasActuales() {
-        return ventasActuales;
-    }
-
-    public TextArea getTextArea() {
-        return tField_infome;
+    private void mostrarExito(String titulo, String msj) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setTitle("Éxito");
+        a.setHeaderText(titulo);
+        a.setContentText(msj);
+        a.showAndWait();
     }
 }
