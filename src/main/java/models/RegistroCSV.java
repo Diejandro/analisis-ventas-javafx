@@ -52,6 +52,20 @@ public class RegistroCSV {
         this.fecha = fecha;
     }
 
+    /*
+     * Convierte un objeto Venta en un registroCSV para poder guardarlo.
+     */
+    public static RegistroCSV fromVenta(Venta v) {
+        return new RegistroCSV(
+                v.getAlumno().getCIF(),
+                v.getAlumno().getNombre(),
+                v.getAlumno().getEmail(),
+                v.getId().toString(),
+                v.getProducto(),
+                v.getPrecio(),
+                v.getFecha()
+        );
+    }
 
     /**
      * Parsear desde array de String.
@@ -86,15 +100,16 @@ public class RegistroCSV {
      * @return the string
      */
     public String toCSV(char sep) {
-    	String s = String.valueOf(sep);
-    	return String.join(s,
-    			cif,
-    			nombre,
-    			id,
-    			producto.nombre(),
-    			String.valueOf(precio),
-    			fecha.toString()
-    			);
+        String s = String.valueOf(sep);
+        return String.join(s,
+                cif != null ? cif : "",
+                nombre != null ? nombre : "",
+                email != null ? email : "",   
+                id != null ? id : "",         
+                producto != null ? producto.nombre() : "", 
+                String.valueOf(precio),       
+                fecha != null ? fecha.toString() : "" 
+        );
     }
 
     /**
