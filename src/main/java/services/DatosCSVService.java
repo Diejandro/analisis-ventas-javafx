@@ -169,5 +169,36 @@ public class DatosCSVService {
     // Getters para la interfaz
     public ObservableList<RegistroCSV> getDatos() { return datos; }
     public char getSeparador() { return separador; }
-    public File getArchivoTemporal() { return archivoTemporal; }
+    public File getArchivoTemporal() { return archivoTemporal; 
+    
+    }
+    
+    /**
+     * Realiza la persistencia física de los registros actuales en un archivo CSV.
+     * <p>
+     * Este método se encarga de escribir la cabecera oficial y cada uno de los 
+     * registros almacenados en memoria en el archivo especificado. Utiliza el 
+     * separador detectado y, tras completar la operación con éxito, actualiza 
+     * el estado interno para indicar que los datos están sincronizados.
+     *
+     * @param archivo el archivo físico de destino donde se volcarán los datos
+     * @throws IOException si ocurre un error durante el proceso de escritura en disco
+     */
+    public void guardarArchivoFinal(File archivo) throws IOException {
+    	try(BufferedWriter bw = new BufferedWriter(new FileWriter(archivo))){
+    		
+    		String cabecera = "CIF" + separador + "Nombre" + separador + "Email" + separador +
+    				"ID_Venta" + separador + "Producto" + separador + "Precio" + separador + "Fecha";
+    		
+    		bw.write(cabecera);
+    		bw.newLine();
+    		
+    		for(RegistroCSV registro : datos) {
+    			
+    			bw.write(registro.toCSV(separador));
+    			bw.newLine();
+    		}
+    	}
+    	this.marcarComoGuardado();
+    }
 }

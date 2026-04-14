@@ -10,6 +10,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -55,6 +57,7 @@ public class VentanaAnalisisController {
     
     /** The root HTML. */
     private VBox rootHTML;
+    
     
     /** The controller HTML. */
     //private VentanaAnalisisHTMLController controllerHTML;
@@ -176,6 +179,51 @@ public class VentanaAnalisisController {
     }
 
     /**
+     * Maneja el evento de clic sobre el botón de guardado de cambios.
+     * <p>
+     * Al activarse, despliega un selector de archivos (FileChooser) para que el 
+     * usuario elija la ruta y el nombre del archivo de destino. Si se confirma 
+     * la elección, solicita al servicio de datos la exportación de la información 
+     * actual y notifica al usuario el resultado mediante una alerta.
+     *
+     * @param event evento de ratón generado al hacer clic sobre el botón solicitado
+     */
+    @FXML
+    void onClickedSave(MouseEvent event) {
+    	FileChooser selector = new FileChooser();
+    	selector.setTitle("Guardar base de datos de la academia");
+    	
+    	selector.getExtensionFilters().add(
+    	        new FileChooser.ExtensionFilter("Archivos CSV (*.csv)", "*.csv")
+    	    );
+    	
+    	javafx.stage.Window ventanaActual = ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+    	File archivoDestino = selector.showSaveDialog(ventanaActual);
+    	
+    	if(archivoDestino != null) {
+    		try {
+    			DatosCSVService.getInstance().guardarArchivoFinal(archivoDestino);
+    			mostrarAlerta(Alert.AlertType.INFORMATION, "Guardado", "¡Datos guardados con éxito!");
+    		}catch (IOException e) {
+    			e.printStackTrace();
+    			mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudo guardar el archivo. Compruebe que no esté abierto");
+    		}
+    	}
+
+    }
+    
+    /**
+     * Método auxiliar para mostrar mensajes rápidos al usuario.
+     */
+    private void mostrarAlerta(AlertType tipo, String titulo, String mensaje) {
+		Alert alert = new Alert(tipo);
+		alert.setTitle(titulo);
+		alert.setHeaderText(null);
+		alert.setContentText(mensaje);
+		alert.showAndWait();
+	}
+
+	/**
      * Maneja el evento de clic sobre la opción "agregar datos".
      * <p>
      * Al activarse, abre una vista secundaria la cual se encarga de 

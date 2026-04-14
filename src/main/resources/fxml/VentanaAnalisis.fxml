@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="rootPaneGeneral" prefHeight="810.0" prefWidth="1315.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.VentanaAnalisisController">
+<BorderPane fx:id="rootPaneGeneral" prefHeight="810.0" prefWidth="1315.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.VentanaAnalisisController">
    <left>
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="250.0" spacing="7.0" stylesheets="@../css/style.css" BorderPane.alignment="CENTER">
          <children>
@@ -80,6 +80,24 @@
                   <Insets left="20.0" right="20.0" />
                </padding>
             </HBox>
+            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="437.0" onMouseClicked="#onClickedSave" prefHeight="45.0" prefWidth="200.0" spacing="20.0" styleClass="mi-boton-lateral">
+               <children>
+                  <ImageView fitHeight="148.0" fitWidth="36.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/Guardar.png" />
+                     </image>
+                  </ImageView>
+                  <Label text="Guardar" textFill="#e6eaf0">
+                     <font>
+                        <Font name="Arial" size="18.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets left="30.0" right="20.0" />
+               </padding>
+            </HBox>
+            <Pane prefHeight="19.0" prefWidth="250.0" />
          </children>
          <styleClass>
             <String fx:value="lateral-bar-vonfig" />
